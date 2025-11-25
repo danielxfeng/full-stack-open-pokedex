@@ -45,20 +45,20 @@ jobs:
         run: curl -X POST "${{ secrets.RENDER_HOOK }}"
       - name: Discord failure notification
         if: ${{ failure() }}
-        uses: rjstone/discord-webhook-notify@v2
+        uses: tsickert/discord-webhook@v7.0.0
         with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-          text: |
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          content: |
             CI/CD Failed  
             Commit: ${{ github.sha }}  
             Author: ${{ github.event.head_commit.author.name }}  
             Message: ${{ github.event.head_commit.message }}
       - name: Discord success notification
         if: ${{ success() }}
-        uses: rjstone/discord-webhook-notify@v2
+        uses: tsickert/discord-webhook@v7.0.0
         with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-          text: |
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          content: |
             CI/CD Done!
   tag_release:
     needs: [simple_deployment_pipeline]
