@@ -43,6 +43,8 @@ jobs:
   tag_release:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
+    env:
+      SHOULD_SKIP: ${{ env.SHOULD_SKIP }}
     if: ${{ needs.simple_deployment_pipeline.result == 'success' && env.SHOULD_SKIP != 'true' }}
     steps:
       - uses: actions/checkout@v4 
