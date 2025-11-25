@@ -14,6 +14,8 @@ env:
 jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-latest
+    outputs:
+      deployed: ${{ steps.DeployToRender.outcome == 'success' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -37,15 +39,13 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-      - name: Deploy to render
+      - name: DeployToRender
         if: ${{ github.event_name == 'push' && env.SHOULD_SKIP != 'true' }}
         run: curl -X POST "${{ secrets.RENDER_HOOK }}"
   tag_release:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
-    env:
-      SHOULD_SKIP: ${{ env.SHOULD_SKIP }}
-    if: ${{ needs.simple_deployment_pipeline.result == 'success' && env.SHOULD_SKIP != 'true' }}
+    if: ${{ needs.simple_deployment_pipeline.result == 'success' && needs.simple_deployment_pipeline.outputs.deployed == 'true' }}
     steps:
       - uses: actions/checkout@v4 
       - name: Bump version and push tag
