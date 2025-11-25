@@ -43,6 +43,23 @@ jobs:
         id: deploy_to_render
         if: ${{ github.event_name == 'push' && env.SHOULD_SKIP != 'true' }}
         run: curl -X POST "${{ secrets.RENDER_HOOK }}"
+      - name: Discord failure notification
+        if: ${{ failure() }}
+        uses: rjstone/discord-webhook-notify@v2
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          text: |
+            CI/CD Failed  
+            Commit: ${{ github.sha }}  
+            Author: ${{ github.event.head_commit.author.name }}  
+            Message: ${{ github.event.head_commit.message }}
+      - name: Discord success notification
+        if: ${{ success() }}
+        uses: rjstone/discord-webhook-notify@v2
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          text: |
+            CI/CD Done!
   tag_release:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
