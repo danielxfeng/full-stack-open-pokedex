@@ -15,7 +15,7 @@ jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-latest
     outputs:
-      deployed: ${{ steps.DeployToRender.outcome == 'success' }}
+      deployed: ${{ steps.deploy_to_render.outcome }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -40,14 +40,15 @@ jobs:
           path: playwright-report/
           retention-days: 30
       - name: DeployToRender
+        id: deploy_to_render
         if: ${{ github.event_name == 'push' && env.SHOULD_SKIP != 'true' }}
         run: curl -X POST "${{ secrets.RENDER_HOOK }}"
   tag_release:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
-    if: ${{ needs.simple_deployment_pipeline.outputs.deployed == 'true' }}
+    if: ${{ needs.simple_deployment_pipeline.outputs.deployed == 'success' }}
     steps:
-      - uses: actions/checkout@v4 
+      - uses: actions/checkout@v4
       - name: Bump version and push tag
         uses: anothrNick/github-tag-action@1.75.0
         env:
