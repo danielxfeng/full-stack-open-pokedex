@@ -45,7 +45,7 @@ jobs:
   tag_release:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
-    if: ${{ needs.simple_deployment_pipeline.result == 'success' && needs.simple_deployment_pipeline.outputs.deployed == 'true' }}
+    if: ${{ needs.simple_deployment_pipeline.outputs.deployed == 'true' }}
     steps:
       - uses: actions/checkout@v4 
       - name: Bump version and push tag
